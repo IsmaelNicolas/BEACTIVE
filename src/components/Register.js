@@ -2,12 +2,15 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import { Alert } from "./Alert";
+import { createDoc } from "../firebaseFunctions";
+
 export function Register() {
   const { signup } = useAuth();
 
   const [user, setUser] = useState({
     email: "",
     password: "",
+    age: "",
   });
 
   const [validPassword, setValidPassword] = useState(false);
@@ -25,6 +28,7 @@ export function Register() {
     e.preventDefault();
     setError("");
     try {
+      await createDoc(user.email, {email: user.email, password: user.password, age: user.age})
       await signup(user.email, user.password);
       navigate("/");
     } catch (error) {
@@ -55,6 +59,7 @@ export function Register() {
     checksCheck[3].state = pass.length >= 9;
 
     setChecks(checksCheck);
+    setValidPassword(checksCheck[0].state && checksCheck[1].state && checksCheck[2].state && checksCheck[3].state)
   };
 
   return (
@@ -76,7 +81,7 @@ export function Register() {
             type="email"
             onChange={(e) => setUser({ ...user, email: e.target.value })}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="youremail@company.tld"
+            placeholder="youremail@someting"
           />
         </div>
 
@@ -106,7 +111,22 @@ export function Register() {
           </div>
         </div>
 
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        <div className="mb-4">
+          <label
+            htmlFor="email"
+            className="block text-gray-700 text-sm font-bold mb-2"
+          >
+            Age
+          </label>
+          <input
+            type="number"
+            onChange={(e) => setUser({ ...user, age: e.target.value })}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            placeholder="18+"
+          />
+        </div>
+
+        <button disabled={!validPassword} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
           Register
         </button>
       </form>

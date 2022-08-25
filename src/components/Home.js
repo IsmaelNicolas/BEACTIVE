@@ -3,6 +3,7 @@ import React,{ useState } from 'react'
 import Notifier from "react-desktop-notification"
 import logo from "../assets/icon.png"
 import {config} from "../Config"
+import { retriveDoc } from "../firebaseFunctions";
 
 export function Home() {
   const { logout, user } = useAuth();
@@ -10,12 +11,22 @@ export function Home() {
   const handleLogout = async () => {
     try {
       await logout();
+      clearInterval(x)
     } catch (error) {
       console.error(error.message);
     }
   };
 
+  React.useEffect(()=>{
+    getUserData(user.email)
+  }, [user.email])
+
   const [value,setValue] = useState("1800000")
+  const [userData, setUserData] = useState({})
+
+  async function getUserData(name){
+      setUserData(await retriveDoc(name));
+  }
 
   function handleChange(e){
     config.interval = parseInt(e.target.value)
@@ -34,6 +45,8 @@ export function Home() {
       );
   }
 
+  console.log(userData);
+
   return (
     <div className="w-full max-w-xs m-auto text-black">
       <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
@@ -42,7 +55,8 @@ export function Home() {
             src={logo} ></img>
         </div>
         <p className="text-xl mb-4">Welcome {user.displayName || user.email}</p>
-        
+        <p className="text-xl mb-4">Your Age is {user.displayName || userData.age}</p>
+
         <div>
           <p>Interval time</p>
         <select
@@ -66,6 +80,7 @@ export function Home() {
         <option value="600000">10 minutes</option>
         <option value="1800000">30 minutes</option>
         <option value="3600000">1 hour</option>
+        <option value="15000">15 seconds</option>
     </select>
         </div>
        <div className="flex justify-center items-center ">
