@@ -66,8 +66,6 @@ export function Home() {
         <option value="600000">10 minutes</option>
         <option value="1800000">30 minutes</option>
         <option value="3600000">1 hour</option>
-        <option value="30000">30 seconds</option>
-        <option value="5000">5 seconds</option>
     </select>
         </div>
        <div className="flex justify-center items-center ">

@@ -10,6 +10,14 @@ export function Register() {
     password: "",
   });
 
+  const [validPassword, setValidPassword] = useState(false);
+  const [checks, setChecks] = useState([
+    { title: "1 Mayus character", state: false },
+    { title: "1 Minus character", state: false },
+    { title: "1 Special character", state: false },
+    { title: "9 characters long", state: false },
+  ]);
+
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -22,6 +30,31 @@ export function Register() {
     } catch (error) {
       setError(error.message);
     }
+  };
+
+  function hasLowerCase(str) {
+    return /[a-z]/.test(str);
+  }
+
+  function hasUpperCase(str) {
+    return /[A-Z]/.test(str);
+  }
+
+  function hasSpecialChar(str) {
+    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    return specialChars.test(str);
+  }
+  const handlePasswordChange = (e) => {
+    let pass = e.target.value;
+    setUser({ ...user, password: pass });
+    let checksCheck = checks;
+
+    checksCheck[2].state = hasSpecialChar(pass);
+    checksCheck[1].state = hasLowerCase(pass);
+    checksCheck[0].state = hasUpperCase(pass);
+    checksCheck[3].state = pass.length >= 9;
+
+    setChecks(checksCheck);
   };
 
   return (
@@ -56,10 +89,21 @@ export function Register() {
           </label>
           <input
             type="password"
-            onChange={(e) => setUser({ ...user, password: e.target.value })}
+            onChange={handlePasswordChange}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="*************"
           />
+
+          <div>
+            {checks.map((item) => {
+              return (
+                <div key={item.title} >
+                  <p style={item.state ? {color: "green"} : {color: "black"}}>{item.state ? "✓ " : "○ "}
+                   {item.title}</p>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
